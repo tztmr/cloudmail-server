@@ -1,12 +1,12 @@
-import orm from '../entity/orm.js';
-import { star } from '../entity/star.js';
-import emailService from './email-service.js';
-import BizError from '../error/biz-error.js';
+import orm from '../entity/orm';
+import { star } from '../entity/star';
+import emailService from './email-service';
+import BizError from '../error/biz-error';
 import { and, desc, eq, lt, sql, inArray } from 'drizzle-orm';
-import email from '../entity/email.js';
-import { isDel } from '../const/entity-const.js';
-import attService from "./att-service.js";
-import { t } from '../i18n/i18n.js'
+import email from '../entity/email';
+import { isDel } from '../const/entity-const';
+import attService from "./att-service";
+import { t } from '../i18n/i18n'
 const starService = {
 
 	async add(c, params, userId) {

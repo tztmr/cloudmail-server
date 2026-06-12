@@ -1,11 +1,11 @@
-import orm from '../entity/orm.js';
-import perm from '../entity/perm.js';
+import orm from '../entity/orm';
+import perm from '../entity/perm';
 import { eq, ne, and, asc } from 'drizzle-orm';
-import rolePerm from '../entity/role-perm.js';
-import user from '../entity/user.js';
-import role from '../entity/role.js';
-import { permConst } from '../const/entity-const.js';
-import { t } from '../i18n/i18n.js'
+import rolePerm from '../entity/role-perm';
+import user from '../entity/user';
+import role from '../entity/role';
+import { permConst } from '../const/entity-const';
+import { t } from '../i18n/i18n'
 
 const permService = {
 	async tree(c) {

@@ -1,7 +1,7 @@
-import app from '../hono/hono.js';
-import starService from '../service/star-service.js';
-import userContext from '../security/user-context.js';
-import result from '../model/result.js';
+import app from '../hono/hono';
+import starService from '../service/star-service';
+import userContext from '../security/user-context';
+import result from '../model/result';
 
 app.post('/star/add', async (c) => {
 	await starService.add(c, await c.req.json(), userContext.getUserId(c));

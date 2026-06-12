@@ -1,4 +1,4 @@
-import verifyRecordService from '../service/verify-record-service.js';
+import verifyRecordService from '../service/verify-record-service';
 
 export const userConst = {
 	status: {

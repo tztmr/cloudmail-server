@@ -1,23 +1,23 @@
-import app from './hono.js';
-import '../security/security.js'
+import app from './hono';
+import '../security/security'
 
-import '../api/email-api.js';
-import '../api/user-api.js';
-import '../api/login-api.js';
-import '../api/setting-api.js';
-import '../api/account-api.js';
-import '../api/star-api.js';
-import '../api/test-api.js';
-import '../api/r2-api.js';
-import '../api/resend-api.js';
-import '../api/user-api.js';
-import '../api/my-api.js';
-import '../api/role-api.js'
-import '../api/all-email-api.js'
-import '../api/init-api.js'
-import '../api/analysis-api.js'
-import '../api/reg-key-api.js'
-import '../api/public-api.js'
-import '../api/telegram-api.js'
-import '../api/oauth-api.js'
+import '../api/email-api';
+import '../api/user-api';
+import '../api/login-api';
+import '../api/setting-api';
+import '../api/account-api';
+import '../api/star-api';
+import '../api/test-api';
+import '../api/r2-api';
+import '../api/resend-api';
+import '../api/user-api';
+import '../api/my-api';
+import '../api/role-api'
+import '../api/all-email-api'
+import '../api/init-api'
+import '../api/analysis-api'
+import '../api/reg-key-api'
+import '../api/public-api'
+import '../api/telegram-api'
+import '../api/oauth-api'
 export default app;

@@ -1,7 +1,7 @@
-import app from '../hono/hono.js';
-import userService from '../service/user-service.js';
-import result from '../model/result.js';
-import userContext from '../security/user-context.js';
+import app from '../hono/hono';
+import userService from '../service/user-service';
+import result from '../model/result';
+import userContext from '../security/user-context';
 
 app.get('/my/loginUserInfo', async (c) => {
 	const user = await userService.loginUserInfo(c, userContext.getUserId(c));

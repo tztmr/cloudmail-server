@@ -1,7 +1,7 @@
-import app from '../hono/hono.js';
-import result from '../model/result.js';
-import regKeyService from '../service/reg-key-service.js';
-import userContext from '../security/user-context.js';
+import app from '../hono/hono';
+import result from '../model/result';
+import regKeyService from '../service/reg-key-service';
+import userContext from '../security/user-context';
 
 app.post('/regKey/add', async (c) => {
 	await regKeyService.add(c, await c.req.json(), await userContext.getUserId(c));

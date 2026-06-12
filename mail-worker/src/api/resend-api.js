@@ -1,5 +1,5 @@
-import resendService from '../service/resend-service.js';
-import app from '../hono/hono.js';
+import resendService from '../service/resend-service';
+import app from '../hono/hono';
 app.post('/webhooks',async (c) => {
 	try {
 		await resendService.webhooks(c, await c.req.json());

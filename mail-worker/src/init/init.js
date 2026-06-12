@@ -1,6 +1,6 @@
-import settingService from '../service/setting-service.js';
-import emailUtils from '../utils/email-utils.js';
-import {emailConst} from "../const/entity-const.js";
+import settingService from '../service/setting-service';
+import emailUtils from '../utils/email-utils';
+import {emailConst} from "../const/entity-const";
 
 const dbInit = {
 	async init(c) {
@@ -31,39 +31,6 @@ const dbInit = {
 		await this.v3_0DB(c);
 		await settingService.refresh(c);
 		return c.text('success');
-	},
-
-	/**
-	 * Docker / server 一键部署友好：无需 secret 直接确保表结构和初始数据存在。
-	 * 在 server.js 启动时调用。
-	 */
-	async ensureSchema(env) {
-		const fakeC = {
-			env,
-			req: { param: () => '' },
-			get: () => undefined,
-			set: () => {},
-		};
-
-		try {
-			await this.intDB(fakeC);
-		} catch (e) { console.warn('[init] intDB warn:', e.message); }
-
-		// 每个迁移独立 try，避免单点失败导致整个启动崩溃（fresh DB 的 RENAME 等是正常的跳过场景）
-		const steps = ['v1_1DB','v1_2DB','v1_3DB','v1_3_1DB','v1_4DB','v1_5DB','v1_6DB','v1_7DB','v2DB','v2_3DB','v2_4DB','v2_5DB','v2_6DB','v2_7DB','v2_8DB','v2_9DB','v3_0DB'];
-		for (const step of steps) {
-			try {
-				if (typeof this[step] === 'function') await this[step](fakeC);
-			} catch (e) {
-				console.warn(`[init] ${step} warn:`, e.message);
-			}
-		}
-
-		try {
-			await settingService.refresh(fakeC).catch(() => {});
-		} catch (_) {}
-
-		console.log('[init] schema ensured (auto on boot)');
 	},
 
 	async v3_0DB(c) {

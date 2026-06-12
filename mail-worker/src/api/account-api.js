@@ -1,7 +1,7 @@
-import app from '../hono/hono.js';
-import accountService from '../service/account-service.js';
-import result from '../model/result.js';
-import userContext from '../security/user-context.js';
+import app from '../hono/hono';
+import accountService from '../service/account-service';
+import result from '../model/result';
+import userContext from '../security/user-context';
 
 app.get('/account/list', async (c) => {
 	const list = await accountService.list(c, c.req.query(), userContext.getUserId(c));

@@ -1,19 +1,19 @@
-import KvConst from '../const/kv-const.js';
-import settingEntity from '../entity/setting.js';
-import orm from '../entity/orm.js';
-import {verifyRecordType} from '../const/entity-const.js';
-import fileUtils from '../utils/file-utils.js';
-import r2Service from './r2-service.js';
-import constant from '../const/constant.js';
-import BizError from '../error/biz-error.js';
-import {t} from '../i18n/i18n.js'
-import verifyRecordService from './verify-record-service.js';
-import userContext from '../security/user-context.js';
+import KvConst from '../const/kv-const';
+import setting from '../entity/setting';
+import orm from '../entity/orm';
+import {verifyRecordType} from '../const/entity-const';
+import fileUtils from '../utils/file-utils';
+import r2Service from './r2-service';
+import constant from '../const/constant';
+import BizError from '../error/biz-error';
+import {t} from '../i18n/i18n'
+import verifyRecordService from './verify-record-service';
+import userContext from '../security/user-context';
 
 const settingService = {
 
 	async refresh(c) {
-		const settingRow = await orm(c).select().from(settingEntity).get();
+		const settingRow = await orm(c).select().from(setting).get();
 		settingRow.resendTokens = JSON.parse(settingRow.resendTokens);
 		c.set('setting', settingRow);
 		await c.env.kv.put(KvConst.SETTING, JSON.stringify(settingRow));
@@ -25,19 +25,7 @@ const settingService = {
 			return c.get('setting')
 		}
 
-		let setting = await c.env.kv.get(KvConst.SETTING, { type: 'json' });
-
-		if (!setting) {
-			// Server / Docker 首次启动或 KV 缓存丢失时，从数据库恢复
-			try {
-				const row = await orm(c).select().from(settingEntity).get();
-				if (row) {
-					row.resendTokens = JSON.parse(row.resendTokens || '{}');
-					setting = row;
-					await c.env.kv.put(KvConst.SETTING, JSON.stringify(setting));
-				}
-			} catch (_) {}
-		}
+		const setting = await c.env.kv.get(KvConst.SETTING, { type: 'json' });
 
 		if (!setting) {
 			throw new BizError('数据库未初始化 Database not initialized.');
@@ -113,10 +101,8 @@ const settingService = {
 		settingRow.s3AccessKey = settingRow.s3AccessKey ? `${settingRow.s3AccessKey.slice(0, 12)}******` : null;
 		settingRow.s3SecretKey = settingRow.s3SecretKey ? `${settingRow.s3SecretKey.slice(0, 12)}******` : null;
 		settingRow.tgBotToken = settingRow.tgBotToken ? `${settingRow.tgBotToken.slice(0, 20)}******` : null;
-		const storageType = await r2Service.storageType(c);
-		settingRow.hasR2 = !!c.env.r2 || storageType === 'LOCAL' || storageType === 'S3';
-		settingRow.hasCfEmail = !!c.env.email;
-		settingRow.storageType = storageType;
+		settingRow.hasR2 = false
+		settingRow.hasCfEmail = false
 
 		let regVerifyOpen = false
 		let addVerifyOpen = false
@@ -154,7 +140,7 @@ const settingService = {
 		}
 
 		params.resendTokens = JSON.stringify(resendTokens);
-		await orm(c).update(settingEntity).set({ ...params }).returning().get();
+		await orm(c).update(setting).set({ ...params }).returning().get();
 		await this.refresh(c);
 	},
 
@@ -164,14 +150,14 @@ const settingService = {
 		if (!background) return
 
 		if (background.startsWith('http')) {
-			await orm(c).update(settingEntity).set({ background: '' }).run();
+			await orm(c).update(setting).set({ background: '' }).run();
 			await this.refresh(c)
 			return;
 		}
 
 		if (background) {
 			await r2Service.delete(c,background)
-			await orm(c).update(settingEntity).set({ background: '' }).run();
+			await orm(c).update(setting).set({ background: '' }).run();
 			await this.refresh(c)
 		}
 	},
@@ -198,7 +184,7 @@ const settingService = {
 
 		}
 
-		await orm(c).update(settingEntity).set({ background }).run();
+		await orm(c).update(setting).set({ background }).run();
 		await this.refresh(c);
 		return background;
 	},
@@ -206,7 +192,7 @@ const settingService = {
 
 	async setBlacklist(c, params) {
 		const { blackSubject, blackContent, blackFrom  } = params
-		await orm(c).update(settingEntity).set({ blackSubject, blackContent, blackFrom }).run();
+		await orm(c).update(setting).set({ blackSubject, blackContent, blackFrom }).run();
 		await this.refresh(c);
 		return this.get(c);
 	},

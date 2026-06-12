@@ -1,27 +1,27 @@
-import orm from '../entity/orm.js';
-import email from '../entity/email.js';
-import { attConst, emailConst, isDel, settingConst } from '../const/entity-const.js';
+import orm from '../entity/orm';
+import email from '../entity/email';
+import { attConst, emailConst, isDel, settingConst } from '../const/entity-const';
 import { and, desc, eq, gt, inArray, lt, count, asc, sql, ne, or, like, lte, gte } from 'drizzle-orm';
-import { star } from '../entity/star.js';
-import settingService from './setting-service.js';
-import accountService from './account-service.js';
-import BizError from '../error/biz-error.js';
-import emailUtils from '../utils/email-utils.js';
-import fileUtils from '../utils/file-utils.js';
+import { star } from '../entity/star';
+import settingService from './setting-service';
+import accountService from './account-service';
+import BizError from '../error/biz-error';
+import emailUtils from '../utils/email-utils';
+import fileUtils from '../utils/file-utils';
 import { Resend } from 'resend';
-import attService from './att-service.js';
+import attService from './att-service';
 import { parseHTML } from 'linkedom';
-import userService from './user-service.js';
-import roleService from './role-service.js';
-import user from '../entity/user.js';
-import starService from './star-service.js';
+import userService from './user-service';
+import roleService from './role-service';
+import user from '../entity/user';
+import starService from './star-service';
 import dayjs from 'dayjs';
-import kvConst from '../const/kv-const.js';
-import { t } from '../i18n/i18n.js'
-import domainUtils from '../utils/domain-uitls.js';
-import account from "../entity/account.js";
-import { att } from '../entity/att.js';
-import telegramService from './telegram-service.js';
+import kvConst from '../const/kv-const';
+import { t } from '../i18n/i18n'
+import domainUtils from '../utils/domain-uitls';
+import account from "../entity/account";
+import { att } from '../entity/att';
+import telegramService from './telegram-service';
 
 const emailService = {
 
@@ -231,10 +231,9 @@ const emailService = {
 
 		const domain = emailUtils.getDomain(accountRow.email);
 		const resendToken = resendTokens[domain];
-		const useCloudflareEmail = !!c.env.email;
 
 		//如果接收方存在站外邮箱，又没有发信服务
-		if (!useCloudflareEmail && !resendToken && !allInternal) {
+		if (!resendToken && !allInternal) {
 			throw new BizError(t('noSendProvider'));
 		}
 
@@ -260,34 +259,20 @@ const emailService = {
 
 		let sendResult = {};
 
-		//存在站外邮箱时，如果配置了 Cloudflare Email Service 就优先使用，否则使用 Resend
+		//存在站外邮箱时使用 Resend 发送
 		if (!allInternal) {
 
-			if (useCloudflareEmail) {
-				sendResult = await this.sendByCloudflareEmail(c, {
-					name,
-					accountEmail: accountRow.email,
-					receiveEmail,
-					subject,
-					text,
-					html,
-					attachments: [...imageDataList, ...attachments],
-					sendType,
-					messageId: emailRow.messageId
-				});
-			} else {
-				sendResult = await this.sendByResend(resendToken, {
-					name,
-					accountEmail: accountRow.email,
-					receiveEmail,
-					subject,
-					text,
-					html,
-					attachments: [...imageDataList, ...attachments],
-					sendType,
-					messageId: emailRow.messageId
-				});
-			}
+			sendResult = await this.sendByResend(resendToken, {
+				name,
+				accountEmail: accountRow.email,
+				receiveEmail,
+				subject,
+				text,
+				html,
+				attachments: [...imageDataList, ...attachments],
+				sendType,
+				messageId: emailRow.messageId
+			});
 
 		}
 
@@ -311,7 +296,7 @@ const emailService = {
 		emailData.content = html;
 		emailData.text = text;
 		emailData.accountId = accountId;
-		emailData.status = useCloudflareEmail ? emailConst.status.DELIVERED : emailConst.status.SENT;
+		emailData.status = emailConst.status.SENT;
 		emailData.type = emailConst.type.SEND;
 		emailData.userId = userId;
 		emailData.resendEmailId = data?.id;
@@ -375,42 +360,6 @@ const emailService = {
 		return [ emailResult ];
 	},
 
-	async sendByCloudflareEmail(c, params) {
-		const sendForm = {
-			from: { email: params.accountEmail, name: params.name },
-			to: [...params.receiveEmail],
-			subject: params.subject
-		};
-
-		if (params.text) {
-			sendForm.text = params.text;
-		}
-
-		if (params.html) {
-			sendForm.html = params.html;
-		}
-
-		const attachments = await this.toCloudflareAttachments(params.attachments);
-		if (attachments.length > 0) {
-			sendForm.attachments = attachments;
-		}
-
-		if (params.sendType === 'reply' && params.messageId) {
-			sendForm.headers = {
-				'in-reply-to': params.messageId,
-				'references': params.messageId
-			};
-		}
-
-		const result = await c.env.email.send(sendForm);
-
-		return {
-			data: {
-				id: result.messageId
-			}
-		};
-	},
-
 	async sendByResend(resendToken, params) {
 		const resend = new Resend(resendToken);
 
@@ -431,25 +380,6 @@ const emailService = {
 		}
 
 		return await resend.emails.send(sendForm);
-	},
-
-	async toCloudflareAttachments(attachments) {
-		const arrayBufferAttachments = await this.toArrayBufferAttachments(attachments);
-
-		return arrayBufferAttachments.map(attachment => {
-			const item = {
-				content: attachment.content,
-				filename: attachment.filename,
-				type: attachment.mimeType || attachment.contentType || attachment.type || 'application/octet-stream',
-				disposition: attachment.contentId ? 'inline' : 'attachment'
-			};
-
-			if (attachment.contentId) {
-				item.contentId = attachment.contentId.replace(/^<|>$/g, '');
-			}
-
-			return item;
-		});
 	},
 
 	async toResendAttachments(attachments = []) {

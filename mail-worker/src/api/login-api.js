@@ -1,7 +1,7 @@
-import app from '../hono/hono.js';
-import loginService from '../service/login-service.js';
-import result from '../model/result.js';
-import userContext from '../security/user-context.js';
+import app from '../hono/hono';
+import loginService from '../service/login-service';
+import result from '../model/result';
+import userContext from '../security/user-context';
 
 app.post('/login', async (c) => {
 	const token = await loginService.login(c, await c.req.json());

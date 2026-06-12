@@ -1,14 +1,14 @@
-import orm from '../entity/orm.js';
-import { att } from '../entity/att.js';
+import orm from '../entity/orm';
+import { att } from '../entity/att';
 import { and, eq, isNull, inArray, desc } from 'drizzle-orm';
-import r2Service from './r2-service.js';
-import constant from '../const/constant.js';
-import fileUtils from '../utils/file-utils.js';
-import { attConst } from '../const/entity-const.js';
+import r2Service from './r2-service';
+import constant from '../const/constant';
+import fileUtils from '../utils/file-utils';
+import { attConst } from '../const/entity-const';
 import { parseHTML } from 'linkedom';
 import { v4 as uuidv4 } from 'uuid';
-import domainUtils from '../utils/domain-uitls.js';
-import settingService from "./setting-service.js";
+import domainUtils from '../utils/domain-uitls';
+import settingService from "./setting-service";
 
 const attService = {
 

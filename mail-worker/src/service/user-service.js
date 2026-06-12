@@ -1,23 +1,23 @@
-import BizError from '../error/biz-error.js';
-import accountService from './account-service.js';
-import orm from '../entity/orm.js';
-import user from '../entity/user.js';
+import BizError from '../error/biz-error';
+import accountService from './account-service';
+import orm from '../entity/orm';
+import user from '../entity/user';
 import { and, asc, count, desc, eq, inArray, sql } from 'drizzle-orm';
-import { emailConst, isDel, roleConst, userConst } from '../const/entity-const.js';
-import kvConst from '../const/kv-const.js';
-import KvConst from '../const/kv-const.js';
-import cryptoUtils from '../utils/crypto-utils.js';
-import emailService from './email-service.js';
+import { emailConst, isDel, roleConst, userConst } from '../const/entity-const';
+import kvConst from '../const/kv-const';
+import KvConst from '../const/kv-const';
+import cryptoUtils from '../utils/crypto-utils';
+import emailService from './email-service';
 import dayjs from 'dayjs';
-import permService from './perm-service.js';
-import roleService from './role-service.js';
-import emailUtils from '../utils/email-utils.js';
-import saltHashUtils from '../utils/crypto-utils.js';
-import constant from '../const/constant.js';
-import { t } from '../i18n/i18n.js'
-import reqUtils from '../utils/req-utils.js';
-import {oauth} from "../entity/oauth.js";
-import oauthService from "./oauth-service.js";
+import permService from './perm-service';
+import roleService from './role-service';
+import emailUtils from '../utils/email-utils';
+import saltHashUtils from '../utils/crypto-utils';
+import constant from '../const/constant';
+import { t } from '../i18n/i18n'
+import reqUtils from '../utils/req-utils';
+import {oauth} from "../entity/oauth";
+import oauthService from "./oauth-service";
 
 const userService = {
 

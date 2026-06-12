@@ -1,4 +1,4 @@
-import { emailConst } from '../const/entity-const.js';
+import { emailConst } from '../const/entity-const';
 
 const analysisDao = {
 	async numberCount(c) {

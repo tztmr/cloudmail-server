@@ -1,5 +1,5 @@
-import emailUtils from '../utils/email-utils.js';
-import { settingConst } from '../const/entity-const.js';
+import emailUtils from '../utils/email-utils';
+import { settingConst } from '../const/entity-const';
 
 const aiService = {
 	async extractCode(c, email, options = {}) {
@@ -7,11 +7,7 @@ const aiService = {
 			return '';
 		}
 
-		const ai = c.env && c.env.ai;
-		if (!ai) {
-			// 服务器端或未绑定 AI 时跳过
-			return '';
-		}
+		const ai = c.env.ai;
 
 		try {
 			const subject = email.subject || '';

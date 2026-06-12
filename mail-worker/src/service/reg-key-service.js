@@ -1,10 +1,10 @@
-import orm from '../entity/orm.js';
-import regKey from '../entity/reg-key.js';
+import orm from '../entity/orm';
+import regKey from '../entity/reg-key';
 import { inArray, like, eq, desc, sql, or } from 'drizzle-orm';
-import roleService from './role-service.js';
-import BizError from '../error/biz-error.js';
-import { formatDetailDate, toUtc } from '../utils/date-uitil.js';
-import userService from './user-service.js';
+import roleService from './role-service';
+import BizError from '../error/biz-error';
+import { formatDetailDate, toUtc } from '../utils/date-uitil';
+import userService from './user-service';
 import { t } from '../i18n/i18n.js';
 
 const regKeyService = {

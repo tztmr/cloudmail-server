@@ -1,24 +1,24 @@
-import BizError from '../error/biz-error.js';
-import userService from './user-service.js';
-import emailUtils from '../utils/email-utils.js';
-import { isDel, settingConst, userConst } from '../const/entity-const.js';
-import JwtUtils from '../utils/jwt-utils.js';
+import BizError from '../error/biz-error';
+import userService from './user-service';
+import emailUtils from '../utils/email-utils';
+import { isDel, settingConst, userConst } from '../const/entity-const';
+import JwtUtils from '../utils/jwt-utils';
 import { v4 as uuidv4 } from 'uuid';
-import KvConst from '../const/kv-const.js';
-import constant from '../const/constant.js';
-import userContext from '../security/user-context.js';
-import verifyUtils from '../utils/verify-utils.js';
-import accountService from './account-service.js';
-import settingService from './setting-service.js';
-import saltHashUtils from '../utils/crypto-utils.js';
-import cryptoUtils from '../utils/crypto-utils.js';
-import turnstileService from './turnstile-service.js';
-import roleService from './role-service.js';
-import regKeyService from './reg-key-service.js';
+import KvConst from '../const/kv-const';
+import constant from '../const/constant';
+import userContext from '../security/user-context';
+import verifyUtils from '../utils/verify-utils';
+import accountService from './account-service';
+import settingService from './setting-service';
+import saltHashUtils from '../utils/crypto-utils';
+import cryptoUtils from '../utils/crypto-utils';
+import turnstileService from './turnstile-service';
+import roleService from './role-service';
+import regKeyService from './reg-key-service';
 import dayjs from 'dayjs';
-import { toUtc } from '../utils/date-uitil.js';
+import { toUtc } from '../utils/date-uitil';
 import { t } from '../i18n/i18n.js';
-import verifyRecordService from './verify-record-service.js';
+import verifyRecordService from './verify-record-service';
 
 const loginService = {
 

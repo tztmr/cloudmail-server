@@ -1,15 +1,15 @@
-import role from '../entity/role.js';
-import orm from '../entity/orm.js';
+import role from '../entity/role';
+import orm from '../entity/orm';
 import { eq, asc, inArray, and } from 'drizzle-orm';
-import BizError from '../error/biz-error.js';
-import rolePerm from '../entity/role-perm.js';
-import perm from '../entity/perm.js';
-import { permConst, roleConst } from '../const/entity-const.js';
-import userService from './user-service.js';
-import user from '../entity/user.js';
-import verifyUtils from '../utils/verify-utils.js';
+import BizError from '../error/biz-error';
+import rolePerm from '../entity/role-perm';
+import perm from '../entity/perm';
+import { permConst, roleConst } from '../const/entity-const';
+import userService from './user-service';
+import user from '../entity/user';
+import verifyUtils from '../utils/verify-utils';
 import { t } from '../i18n/i18n.js';
-import emailUtils from '../utils/email-utils.js';
+import emailUtils from '../utils/email-utils';
 
 const roleService = {
 

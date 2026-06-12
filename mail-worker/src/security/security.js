@@ -1,12 +1,12 @@
-import BizError from '../error/biz-error.js';
-import constant from '../const/constant.js';
-import jwtUtils from '../utils/jwt-utils.js';
-import KvConst from '../const/kv-const.js';
+import BizError from '../error/biz-error';
+import constant from '../const/constant';
+import jwtUtils from '../utils/jwt-utils';
+import KvConst from '../const/kv-const';
 import dayjs from 'dayjs';
-import userService from '../service/user-service.js';
-import permService from '../service/perm-service.js';
-import { t } from '../i18n/i18n.js'
-import app from '../hono/hono.js';
+import userService from '../service/user-service';
+import permService from '../service/perm-service';
+import { t } from '../i18n/i18n'
+import app from '../hono/hono';
 
 const exclude = [
 	'/login',
@@ -90,12 +90,6 @@ const premKey = {
 };
 
 app.use('*', async (c, next) => {
-
-	if (!c.env && globalThis.serverEnv) {
-		c.env = { ...globalThis.serverEnv };
-	}
-	c.env = c.env || {};
-	c.env.isServer = c.env.isServer || !!globalThis.serverEnv;
 
 	const path = c.req.path;
 

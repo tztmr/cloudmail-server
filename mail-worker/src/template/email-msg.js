@@ -1,4 +1,4 @@
-import emailUtils from '../utils/email-utils.js';
+import emailUtils from '../utils/email-utils';
 
 const TELEGRAM_MESSAGE_LIMIT = 3500;
 const TRUNCATED_SUFFIX = '...';

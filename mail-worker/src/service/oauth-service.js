@@ -1,10 +1,10 @@
-import BizError from "../error/biz-error.js";
-import orm from "../entity/orm.js";
-import {oauth} from "../entity/oauth.js";
+import BizError from "../error/biz-error";
+import orm from "../entity/orm";
+import {oauth} from "../entity/oauth";
 import { eq, inArray } from 'drizzle-orm';
-import userService from "./user-service.js";
-import loginService from "./login-service.js";
-import cryptoUtils from "../utils/crypto-utils.js";
+import userService from "./user-service";
+import loginService from "./login-service";
+import cryptoUtils from "../utils/crypto-utils";
 
 const oauthService = {
 

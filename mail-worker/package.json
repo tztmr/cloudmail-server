@@ -4,27 +4,19 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "wrangler dev --config wrangler-dev.toml",
-		"test": "wrangler deploy --config wrangler-test.toml",
-		"deploy": "wrangler deploy",
-		"start": "wrangler dev",
-		"dev:server": "node --watch src/server.js",
-		"start:server": "node src/server.js",
-		"build:vue": "pnpm --prefix ../mail-vue install && pnpm --prefix ../mail-vue run build"
-	},
-	"devDependencies": {
-		"@cloudflare/vitest-pool-workers": "^0.7.5",
-		"vitest": "~3.0.7",
-		"wrangler": "^4.90.0"
+		"build": "pnpm run build:server",
+		"build:server": "node scripts/build-server.mjs",
+		"start:server": "node dist-server/server.cjs",
+		"build:vue": "pnpm --prefix ../mail-vue run build"
 	},
 	"dependencies": {
 		"@aws-sdk/client-s3": "^3.882.0",
-		"@cloudflare/vite-plugin": "1.6.0",
 		"@hono/node-server": "^1.13.7",
 		"better-sqlite3": "^11.7.0",
 		"dayjs": "^1.11.13",
 		"dotenv": "^16.4.7",
 		"drizzle-orm": "^0.42.0",
+		"esbuild": "^0.25.9",
 		"hono": "4.12.16",
 		"i18next": "^25.3.2",
 		"linkedom": "^0.18.10",

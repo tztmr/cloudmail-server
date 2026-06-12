@@ -1,17 +1,17 @@
-import BizError from '../error/biz-error.js';
-import verifyUtils from '../utils/verify-utils.js';
-import emailUtils from '../utils/email-utils.js';
-import userService from './user-service.js';
-import emailService from './email-service.js';
-import orm from '../entity/orm.js';
-import account from '../entity/account.js';
+import BizError from '../error/biz-error';
+import verifyUtils from '../utils/verify-utils';
+import emailUtils from '../utils/email-utils';
+import userService from './user-service';
+import emailService from './email-service';
+import orm from '../entity/orm';
+import account from '../entity/account';
 import { and, asc, eq, gt, inArray, count, sql, ne, or, lt, desc } from 'drizzle-orm';
-import {accountConst, isDel, settingConst} from '../const/entity-const.js';
-import settingService from './setting-service.js';
-import turnstileService from './turnstile-service.js';
-import roleService from './role-service.js';
-import { t } from '../i18n/i18n.js';
-import verifyRecordService from './verify-record-service.js';
+import {accountConst, isDel, settingConst} from '../const/entity-const';
+import settingService from './setting-service';
+import turnstileService from './turnstile-service';
+import roleService from './role-service';
+import { t } from '../i18n/i18n';
+import verifyRecordService from './verify-record-service';
 
 const accountService = {
 

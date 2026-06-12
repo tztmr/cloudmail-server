@@ -6,6 +6,8 @@ node_modules/
 dist/
 **/dist/
 mail-worker/dist/
+**/dist-server/
+.pnpm-store/
 
 # Data and runtime
 data/

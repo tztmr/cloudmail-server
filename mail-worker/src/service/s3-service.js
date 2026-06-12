@@ -1,7 +1,7 @@
 import { S3Client, PutObjectCommand, DeleteObjectsCommand, GetObjectCommand } from "@aws-sdk/client-s3";
-import settingService from './setting-service.js';
-import domainUtils from '../utils/domain-uitls.js';
-import { settingConst } from '../const/entity-const.js';
+import settingService from './setting-service';
+import domainUtils from '../utils/domain-uitls';
+import { settingConst } from '../const/entity-const';
 const s3Service = {
 
 	async putObj(c, key, content, metadata) {

@@ -177,11 +177,8 @@
                 </div>
               </div>
               <div class="setting-item">
-                <div><span>{{ setting.hasCfEmail ? $t('cloudflareEmailSending') : $t('resendToken') }}</span></div>
-                <div v-if="setting.hasCfEmail">
-                  <span>{{ $t('enabled') }}</span>
-                </div>
-                <div v-else>
+                <div><span>{{ $t('resendToken') }}</span></div>
+                <div>
                   <el-button class="opt-button" style="margin-top: 0" @click="openResendList" size="small"
                              type="primary">
                     <Icon icon="ic:round-list" width="18" height="18"/>
@@ -365,7 +362,7 @@
           </div>
 
           <div class="settings-card">
-            <div class="card-title">Workers AI</div>
+            <div class="card-title">{{ $t('codeRecognition') }}</div>
             <div class="card-content">
               <div class="setting-item">
                 <div><span>{{ $t('codeRecognition') }}</span></div>

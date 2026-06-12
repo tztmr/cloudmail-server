@@ -1,8 +1,8 @@
-import app from '../hono/hono.js';
-import roleService from '../service/role-service.js';
-import userContext from '../security/user-context.js';
-import result from '../model/result.js';
-import permService from '../service/perm-service.js';
+import app from '../hono/hono';
+import roleService from '../service/role-service';
+import userContext from '../security/user-context';
+import result from '../model/result';
+import permService from '../service/perm-service';
 
 app.post('/role/add', async (c) => {
 	await roleService.add(c, await c.req.json(), userContext.getUserId(c));

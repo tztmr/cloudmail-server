@@ -1,6 +1,6 @@
-import app from '../hono/hono.js';
-import emailService from '../service/email-service.js';
-import result from '../model/result.js';
+import app from '../hono/hono';
+import emailService from '../service/email-service';
+import result from '../model/result';
 
 app.get('/allEmail/list', async (c) => {
 	const data = await emailService.allList(c, c.req.query());

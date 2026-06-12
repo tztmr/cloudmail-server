@@ -1,5 +1,5 @@
-import JwtUtils from '../utils/jwt-utils.js';
-import constant from '../const/constant.js';
+import JwtUtils from '../utils/jwt-utils';
+import constant from '../const/constant';
 
 const userContext = {
 	getUserId(c) {
@@ -12,6 +12,9 @@ const userContext = {
 
 	async getToken(c) {
 		const jwt = c.req.header(constant.TOKEN_HEADER);
+		if (!jwt) {
+			return null;
+		}
 		const result = await JwtUtils.verifyToken(c,jwt);
 		return result?.token;
 	},

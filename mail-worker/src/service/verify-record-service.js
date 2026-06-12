@@ -1,9 +1,9 @@
-import orm from '../entity/orm.js';
-import verifyRecord from '../entity/verify-record.js';
+import orm from '../entity/orm';
+import verifyRecord from '../entity/verify-record';
 import { eq, sql, and } from 'drizzle-orm';
 import dayjs from 'dayjs';
-import reqUtils from '../utils/req-utils.js';
-import { verifyRecordType } from '../const/entity-const.js';
+import reqUtils from '../utils/req-utils';
+import { verifyRecordType } from '../const/entity-const';
 
 const verifyRecordService = {
 

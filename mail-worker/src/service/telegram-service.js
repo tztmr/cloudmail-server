@@ -1,18 +1,18 @@
-import orm from '../entity/orm.js';
-import email from '../entity/email.js';
-import settingService from './setting-service.js';
+import orm from '../entity/orm';
+import email from '../entity/email';
+import settingService from './setting-service';
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc.js';
-import timezone from 'dayjs/plugin/timezone.js';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 dayjs.extend(utc);
 dayjs.extend(timezone);
 import { eq } from 'drizzle-orm';
-import jwtUtils from '../utils/jwt-utils.js';
-import emailMsgTemplate from '../template/email-msg.js';
-import emailTextTemplate from '../template/email-text.js';
-import emailHtmlTemplate from '../template/email-html.js';
-import verifyUtils from '../utils/verify-utils.js';
-import domainUtils from "../utils/domain-uitls.js";
+import jwtUtils from '../utils/jwt-utils';
+import emailMsgTemplate from '../template/email-msg';
+import emailTextTemplate from '../template/email-text';
+import emailHtmlTemplate from '../template/email-html';
+import verifyUtils from '../utils/verify-utils';
+import domainUtils from "../utils/domain-uitls";
 
 const telegramService = {
 
@@ -51,7 +51,7 @@ const telegramService = {
 
 		const jwtToken = await jwtUtils.generateToken(c, { emailId: email.emailId })
 
-		const webAppUrl = customDomain ? `${domainUtils.toOssDomain(customDomain)}/api/telegram/getEmail/${jwtToken}` : 'https://www.cloudflare.com/404'
+		const webAppUrl = customDomain ? `${domainUtils.toOssDomain(customDomain)}/api/telegram/getEmail/${jwtToken}` : 'about:blank'
 		const inlineKeyboard = [
 			[
 				{

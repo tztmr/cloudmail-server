@@ -1,7 +1,7 @@
 import i18next from 'i18next';
 import zh from './zh.js'
 import en from './en.js'
-import app from '../hono/hono.js';
+import app from '../hono/hono';
 
 app.use('*', async (c, next) => {
 	const lang = c.req.header('accept-language')?.split('-')[0]

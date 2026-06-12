@@ -1,19 +1,19 @@
-import BizError from '../error/biz-error.js';
-import orm from '../entity/orm.js';
+import BizError from '../error/biz-error';
+import orm from '../entity/orm';
 import { v4 as uuidv4 } from 'uuid';
 import { and, asc, desc, eq, sql } from 'drizzle-orm';
-import saltHashUtils from '../utils/crypto-utils.js';
-import cryptoUtils from '../utils/crypto-utils.js';
-import emailUtils from '../utils/email-utils.js';
-import roleService from './role-service.js';
-import verifyUtils from '../utils/verify-utils.js';
-import { t } from '../i18n/i18n.js';
-import reqUtils from '../utils/req-utils.js';
+import saltHashUtils from '../utils/crypto-utils';
+import cryptoUtils from '../utils/crypto-utils';
+import emailUtils from '../utils/email-utils';
+import roleService from './role-service';
+import verifyUtils from '../utils/verify-utils';
+import { t } from '../i18n/i18n';
+import reqUtils from '../utils/req-utils';
 import dayjs from 'dayjs';
-import { isDel, roleConst } from '../const/entity-const.js';
-import email from '../entity/email.js';
-import userService from './user-service.js';
-import KvConst from '../const/kv-const.js';
+import { isDel, roleConst } from '../const/entity-const';
+import email from '../entity/email';
+import userService from './user-service';
+import KvConst from '../const/kv-const';
 
 const publicService = {
 

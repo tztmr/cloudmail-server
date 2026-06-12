@@ -1,6 +1,6 @@
-import BizError from '../error/biz-error.js';
-import settingService from './setting-service.js';
-import { t } from '../i18n/i18n.js'
+import BizError from '../error/biz-error';
+import settingService from './setting-service';
+import { t } from '../i18n/i18n'
 
 const turnstileService = {
 
@@ -20,7 +20,7 @@ const turnstileService = {
 			body: new URLSearchParams({
 				secret: settingRow.secretKey,
 				response: token,
-				remoteip: c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || c.req.header('x-real-ip') || ''
+				remoteip: c.req.header('cf-connecting-ip')
 			})
 		});
 

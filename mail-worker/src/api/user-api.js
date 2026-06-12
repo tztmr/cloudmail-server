@@ -1,8 +1,8 @@
-import app from '../hono/hono.js';
-import userService from '../service/user-service.js';
-import result from '../model/result.js';
-import userContext from '../security/user-context.js';
-import accountService from '../service/account-service.js';
+import app from '../hono/hono';
+import userService from '../service/user-service';
+import result from '../model/result';
+import userContext from '../security/user-context';
+import accountService from '../service/account-service';
 
 app.delete('/user/delete', async (c) => {
 	await userService.physicsDelete(c, c.req.query());

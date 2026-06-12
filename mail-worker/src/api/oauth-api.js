@@ -1,6 +1,6 @@
-import app from '../hono/hono.js';
-import result from "../model/result.js";
-import oauthService from "../service/oauth-service.js";
+import app from '../hono/hono';
+import result from "../model/result";
+import oauthService from "../service/oauth-service";
 
 app.post('/oauth/linuxDo/login', async (c) => {
 	const loginInfo = await oauthService.linuxDoLogin(c, await c.req.json());

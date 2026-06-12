@@ -1,6 +1,6 @@
-import app from '../hono/hono.js';
-import analysisService from '../service/analysis-service.js';
-import result from '../model/result.js';
+import app from '../hono/hono';
+import analysisService from '../service/analysis-service';
+import result from '../model/result';
 
 app.get('/analysis/echarts', async (c) => {
 	const data = await analysisService.echarts(c, c.req.query());
