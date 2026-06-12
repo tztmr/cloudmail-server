@@ -11,6 +11,38 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
+RUN mkdir -p /app/mail-vue /app/mail-worker
+RUN cat > /app/mail-vue/pnpm-workspace.yaml <<'EOF'
+packages:
+  - ./
+
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - esbuild
+  - vue-demi
+
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
+  vue-demi: true
+EOF
+RUN cat > /app/mail-worker/pnpm-workspace.yaml <<'EOF'
+packages:
+  - ./
+
+onlyBuiltDependencies:
+  - better-sqlite3
+  - esbuild
+  - sharp
+  - workerd
+
+allowBuilds:
+  better-sqlite3: true
+  esbuild: true
+  sharp: true
+  workerd: true
+EOF
+
 # Copy package files first for better layer caching
 COPY mail-worker/package.json mail-worker/pnpm-lock.yaml mail-worker/pnpm-workspace.yaml ./mail-worker/
 COPY mail-vue/package.json mail-vue/pnpm-lock.yaml mail-vue/pnpm-workspace.yaml ./mail-vue/
@@ -24,6 +56,38 @@ RUN cd mail-vue && pnpm install --frozen-lockfile
 
 # Copy full source
 COPY . .
+
+# Guard against stale/invalid workspace config from older checkouts in the build context.
+RUN cat > /app/mail-vue/pnpm-workspace.yaml <<'EOF'
+packages:
+  - ./
+
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - esbuild
+  - vue-demi
+
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
+  vue-demi: true
+EOF
+RUN cat > /app/mail-worker/pnpm-workspace.yaml <<'EOF'
+packages:
+  - ./
+
+onlyBuiltDependencies:
+  - better-sqlite3
+  - esbuild
+  - sharp
+  - workerd
+
+allowBuilds:
+  better-sqlite3: true
+  esbuild: true
+  sharp: true
+  workerd: true
+EOF
 
 # Build frontend into mail-worker/dist
 RUN cd mail-vue && pnpm run build -- --mode release

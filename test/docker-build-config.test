@@ -23,3 +23,5 @@ grep -Fqx '  sharp: true' "${ROOT_DIR}/mail-worker/pnpm-workspace.yaml"
 grep -Fqx '  workerd: true' "${ROOT_DIR}/mail-worker/pnpm-workspace.yaml"
 
 grep -Fqx 'RUN cd mail-vue && pnpm install --frozen-lockfile' "${ROOT_DIR}/Dockerfile"
+grep -Fqx "RUN cat > /app/mail-vue/pnpm-workspace.yaml <<'EOF'" "${ROOT_DIR}/Dockerfile"
+grep -Fqx "RUN cat > /app/mail-worker/pnpm-workspace.yaml <<'EOF'" "${ROOT_DIR}/Dockerfile"
