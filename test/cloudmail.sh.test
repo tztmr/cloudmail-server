@@ -55,3 +55,29 @@ PROJECT_SOURCE=""
 prompt_for_project_root
 [[ "$PROJECT_ROOT" == "$tmp_manual_project" ]]
 [[ "$PROJECT_SOURCE" == "local" ]]
+
+tmp_cloned_project="$(mktemp -d)"
+prompt_marker="$(mktemp)"
+rm -f "$prompt_marker"
+trap 'rm -f "$tmp_env" "$prompt_marker"; rm -rf "$tmp_project" "$tmp_script_dir" "$tmp_manual_project" "$tmp_cloned_project"' EXIT
+touch "$tmp_cloned_project/docker-compose.yml" "$tmp_cloned_project/Dockerfile"
+
+is_interactive() { return 0; }
+discover_local_project_root() { return 1; }
+prompt_default() {
+  : > "$prompt_marker"
+  printf '%s' ""
+}
+clone_or_update_repo() {
+  PROJECT_ROOT="$tmp_cloned_project"
+  PROJECT_SOURCE="git"
+}
+ensure_project_root() { :; }
+detect_env_file() { :; }
+detect_public_ports() { :; }
+install_docker_if_needed() { :; }
+
+prepare_runtime
+[[ "$PROJECT_ROOT" == "$tmp_cloned_project" ]]
+[[ "$PROJECT_SOURCE" == "git" ]]
+[[ ! -f "$prompt_marker" ]]

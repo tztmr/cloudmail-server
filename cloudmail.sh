@@ -505,8 +505,6 @@ NGINX_EOF"
 prepare_runtime() {
   if discover_local_project_root; then
     :
-  elif is_interactive && prompt_for_project_root; then
-    :
   else
     clone_or_update_repo "$DEFAULT_INSTALL_DIR"
     if ! is_valid_project_root "$PROJECT_ROOT"; then
