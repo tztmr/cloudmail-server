@@ -60,6 +60,10 @@ prompt_default() {
   printf '%s' "$answer"
 }
 
+is_interactive() {
+  [[ -t 0 && -t 1 ]]
+}
+
 ask_yes_no() {
   local prompt="$1" def="${2:-y}" answer="" hint="[Y/n]"
   [[ "$def" == "n" ]] && hint="[y/N]"
@@ -105,6 +109,43 @@ while (( $# > 0 )); do
   esac
   shift
 done
+
+portable_sed_inplace() {
+  local expr="$1" file="$2"
+  if sed --version >/dev/null 2>&1; then
+    sed -i -e "$expr" "$file"
+  else
+    sed -i '' -e "$expr" "$file"
+  fi
+}
+
+escape_sed_replacement() {
+  printf '%s' "$1" | sed -e 's/[&|\\]/\\&/g'
+}
+
+set_env_value() {
+  local key="$1" value="$2" escaped_value
+  escaped_value="$(escape_sed_replacement "$value")"
+
+  if (( DRY_RUN )); then
+    info "[dry-run] set ${key}=*** in ${ENV_FILE}"
+    return 0
+  fi
+
+  if grep -Eq "^[[:space:]]*${key}[[:space:]]*=" "$ENV_FILE"; then
+    portable_sed_inplace "s|^[[:space:]]*${key}[[:space:]]*=.*$|${key}=${escaped_value}|" "$ENV_FILE"
+  else
+    printf '%s=%s\n' "$key" "$value" >> "$ENV_FILE"
+  fi
+}
+
+generate_secret() {
+  if command_exists openssl; then
+    openssl rand -hex 32
+  else
+    LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 64
+  fi
+}
 
 run_cmd() {
   if (( DRY_RUN )); then
@@ -315,6 +356,114 @@ read_env_value() {
   printf '%s' "$value"
 }
 
+is_default_or_empty_env() {
+  local key="$1" value="$2"
+  case "$key" in
+    JWT_SECRET)
+      [[ -z "$value" || "$value" == "change-me-at-least-32-random-chars" || "$value" == "请替换为至少32位强随机字符串" || ${#value} -lt 32 ]]
+      ;;
+    ADMIN)
+      [[ -z "$value" || "$value" == "admin@yourdomain.com" || "$value" == "admin@example.com" ]]
+      ;;
+    DOMAIN)
+      [[ -z "$value" || "$value" == '["yourdomain.com"]' || "$value" == '["example.com"]' || "$value" == '["localhost"]' ]]
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+domain_from_admin() {
+  local admin="$1"
+  if [[ "$admin" == *@* ]]; then
+    printf '%s' "${admin##*@}"
+  else
+    printf 'yourdomain.com'
+  fi
+}
+
+normalize_domain_json() {
+  local value
+  value="$(trim "${1:-}")"
+  if [[ "$value" == \[*\] ]]; then
+    printf '%s' "$value"
+  else
+    value="${value#@}"
+    printf '["%s"]' "$value"
+  fi
+}
+
+validate_required_env_or_prompt() {
+  local jwt admin domains default_jwt default_domain changed=0
+
+  if (( DRY_RUN )) && [[ ! -f "$ENV_FILE" ]]; then
+    warn "[dry-run] 环境文件尚未实际创建，跳过默认值强制检查"
+    return 0
+  fi
+
+  jwt="$(read_env_value JWT_SECRET || true)"
+  admin="$(read_env_value ADMIN || true)"
+  domains="$(read_env_value DOMAIN || true)"
+
+  if ! is_default_or_empty_env JWT_SECRET "$jwt" \
+    && ! is_default_or_empty_env ADMIN "$admin" \
+    && ! is_default_or_empty_env DOMAIN "$domains"; then
+    return 0
+  fi
+
+  warn "检测到 .env 仍使用默认/不安全配置，必须修改后才能部署"
+  warn "配置文件：${ENV_FILE}"
+
+  if ! is_interactive; then
+    die "非交互模式不能自动询问配置，请手动修改 JWT_SECRET / ADMIN / DOMAIN 后重新执行"
+  fi
+
+  default_jwt="$(generate_secret)"
+  if ! is_default_or_empty_env JWT_SECRET "$jwt"; then
+    default_jwt="$jwt"
+  fi
+
+  while true; do
+    jwt="$(prompt_default "JWT_SECRET（至少32位，直接回车使用自动生成值）" "$default_jwt")"
+    if [[ ${#jwt} -ge 32 && "$jwt" != "change-me-at-least-32-random-chars" ]]; then
+      break
+    fi
+    warn "JWT_SECRET 至少需要 32 位，且不能使用默认值"
+  done
+
+  while true; do
+    admin="$(prompt_default "管理员邮箱 ADMIN（如 admin@example.com）" "$admin")"
+    if [[ "$admin" == *@* && "$admin" != "admin@yourdomain.com" && "$admin" != "admin@example.com" ]]; then
+      break
+    fi
+    warn "请输入真实管理员邮箱，不能使用 admin@yourdomain.com"
+  done
+
+  default_domain="$(domain_from_admin "$admin")"
+  if ! is_default_or_empty_env DOMAIN "$domains"; then
+    default_domain="$domains"
+  fi
+
+  while true; do
+    domains="$(prompt_default "收信域名 DOMAIN（可填 example.com 或 [\"example.com\"]）" "$default_domain")"
+    domains="$(normalize_domain_json "$domains")"
+    if [[ "$domains" != '["yourdomain.com"]' && "$domains" != '["example.com"]' && "$domains" != '["localhost"]' ]]; then
+      break
+    fi
+    warn "请输入真实收信域名，不能使用默认域名"
+  done
+
+  set_env_value JWT_SECRET "$jwt"
+  set_env_value ADMIN "$admin"
+  set_env_value DOMAIN "$domains"
+  changed=1
+
+  if (( changed )); then
+    ok "关键配置已写入 ${ENV_FILE}"
+  fi
+}
+
 detect_env_file() {
   ENV_FILE="$PROJECT_ROOT/.env"
   if [[ ! -f "$ENV_FILE" ]]; then
@@ -388,6 +537,7 @@ deploy() {
   prepare_project_root
   ensure_project_root
   detect_env_file
+  validate_required_env_or_prompt
   load_ports
   install_docker_if_needed
   compose_up
@@ -435,6 +585,7 @@ update_app() {
   fi
   pick_compose_cmd
   detect_env_file
+  validate_required_env_or_prompt
   load_ports
   compose_up
   save_state
