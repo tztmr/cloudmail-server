@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+
+grep -Fqx 'packages:' "${ROOT_DIR}/mail-vue/pnpm-workspace.yaml"
+grep -Fqx '  - ./' "${ROOT_DIR}/mail-vue/pnpm-workspace.yaml"
+grep -Fqx 'onlyBuiltDependencies:' "${ROOT_DIR}/mail-vue/pnpm-workspace.yaml"
+grep -Fqx "  - '@parcel/watcher'" "${ROOT_DIR}/mail-vue/pnpm-workspace.yaml"
+grep -Fqx '  - esbuild' "${ROOT_DIR}/mail-vue/pnpm-workspace.yaml"
+grep -Fqx '  - vue-demi' "${ROOT_DIR}/mail-vue/pnpm-workspace.yaml"
+grep -Fqx 'allowBuilds:' "${ROOT_DIR}/mail-vue/pnpm-workspace.yaml"
+grep -Fqx "  '@parcel/watcher': true" "${ROOT_DIR}/mail-vue/pnpm-workspace.yaml"
+grep -Fqx '  esbuild: true' "${ROOT_DIR}/mail-vue/pnpm-workspace.yaml"
+grep -Fqx '  vue-demi: true' "${ROOT_DIR}/mail-vue/pnpm-workspace.yaml"
+
+grep -Fqx 'packages:' "${ROOT_DIR}/mail-worker/pnpm-workspace.yaml"
+grep -Fqx '  - ./' "${ROOT_DIR}/mail-worker/pnpm-workspace.yaml"
+grep -Fqx 'allowBuilds:' "${ROOT_DIR}/mail-worker/pnpm-workspace.yaml"
+grep -Fqx '  better-sqlite3: true' "${ROOT_DIR}/mail-worker/pnpm-workspace.yaml"
+grep -Fqx '  esbuild: true' "${ROOT_DIR}/mail-worker/pnpm-workspace.yaml"
+grep -Fqx '  sharp: true' "${ROOT_DIR}/mail-worker/pnpm-workspace.yaml"
+grep -Fqx '  workerd: true' "${ROOT_DIR}/mail-worker/pnpm-workspace.yaml"
+
+grep -Fqx 'RUN cd mail-vue && pnpm install --frozen-lockfile' "${ROOT_DIR}/Dockerfile"

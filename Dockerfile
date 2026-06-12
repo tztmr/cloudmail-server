@@ -12,15 +12,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 # Copy package files first for better layer caching
-COPY mail-worker/package.json mail-worker/pnpm-lock.yaml ./mail-worker/
-COPY mail-vue/package.json mail-vue/pnpm-lock.yaml ./mail-vue/
+COPY mail-worker/package.json mail-worker/pnpm-lock.yaml mail-worker/pnpm-workspace.yaml ./mail-worker/
+COPY mail-vue/package.json mail-vue/pnpm-lock.yaml mail-vue/pnpm-workspace.yaml ./mail-vue/
 
 # Install pnpm globally
 RUN npm install -g pnpm@9
 
 # Install deps (builder needs full for build + native compile)
 RUN cd mail-worker && pnpm install --frozen-lockfile
-RUN cd mail-vue && pnpm install --frozen-lockfile --ignore-scripts
+RUN cd mail-vue && pnpm install --frozen-lockfile
 
 # Copy full source
 COPY . .
@@ -45,7 +45,6 @@ WORKDIR /app
 
 # Copy built artifacts + node_modules from builder (contains the compiled better-sqlite3)
 COPY --from=builder /app/mail-worker /app/mail-worker
-COPY --from=builder /app/mail-vue/dist /app/mail-worker/dist 2>/dev/null || true
 
 # Create data dir (will be volume mounted)
 RUN mkdir -p /app/mail-worker/data
