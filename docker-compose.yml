@@ -20,9 +20,7 @@ services:
       DOMAIN: ${DOMAIN:-["yourdomain.com"]}
     ports:
       - "${PORT:-3000}:3000"
-      - "${SMTP_PUBLIC_PORT:-2525}:2525"
-      # 生产收信通常需要宿主机 25 端口：
-      # - "25:2525"
+      - "${SMTP_PUBLIC_PORT:-25}:2525"
     volumes:
       - cloudmail-data:/app/data
 

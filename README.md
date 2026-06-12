@@ -51,10 +51,10 @@ DOMAIN=["yourdomain.com"]
 ```env
 PORT=3000
 SMTP_PORT=2525
-SMTP_PUBLIC_PORT=2525
+SMTP_PUBLIC_PORT=25
 ```
 
-如果要正式收信，通常需要把服务器宿主机的 25 端口映射到容器的 2525：
+一键部署默认会把服务器宿主机的 25 端口映射到容器的 2525：
 
 ```yaml
 ports:
@@ -76,7 +76,7 @@ docker compose logs -f cloudmail
 访问：
 
 - Web UI + API：`http://服务器IP:3000`
-- SMTP 接收：`服务器IP:2525` 或映射后的 `服务器IP:25`
+- SMTP 接收：`服务器IP:25`
 
 ## DNS
 

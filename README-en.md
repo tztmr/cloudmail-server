@@ -36,10 +36,10 @@ Default ports:
 ```env
 PORT=3000
 SMTP_PORT=2525
-SMTP_PUBLIC_PORT=2525
+SMTP_PUBLIC_PORT=25
 ```
 
-For production inbound email, map host port 25 to the container SMTP port:
+The one-command deployment maps host port 25 to the container SMTP port by default:
 
 ```yaml
 ports:
@@ -61,7 +61,7 @@ docker compose logs -f cloudmail
 Access:
 
 - Web UI + API: `http://server-ip:3000`
-- SMTP receiving: `server-ip:2525` or mapped `server-ip:25`
+- SMTP receiving: `server-ip:25`
 
 ## DNS
 

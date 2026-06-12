@@ -11,7 +11,7 @@ fi
 
 APP_NAME="cloudmail-server"
 DEFAULT_WEB_PORT="3000"
-DEFAULT_SMTP_PORT="2525"
+DEFAULT_SMTP_PORT="25"
 DEFAULT_GIT_REPO_URL="https://github.com/tztmr/cloudmail-server.git"
 if (( EUID == 0 )); then
   DEFAULT_INSTALL_DIR="/opt/cloudmail-server"
@@ -481,6 +481,21 @@ validate_required_env_or_prompt() {
   fi
 }
 
+ensure_smtp_public_port() {
+  local public_port
+
+  if (( DRY_RUN )) && [[ ! -f "$ENV_FILE" ]]; then
+    return 0
+  fi
+
+  public_port="$(read_env_value SMTP_PUBLIC_PORT || true)"
+  if [[ -z "$public_port" || "$public_port" == "2525" ]]; then
+    warn "SMTP_PUBLIC_PORT 当前为 ${public_port:-空}，正常公网收信需要映射宿主机 25 端口"
+    set_env_value SMTP_PUBLIC_PORT "25"
+    ok "已设置 SMTP_PUBLIC_PORT=25"
+  fi
+}
+
 detect_env_file() {
   ENV_FILE="$PROJECT_ROOT/.env"
   if [[ ! -f "$ENV_FILE" ]]; then
@@ -555,6 +570,7 @@ deploy() {
   ensure_project_root
   detect_env_file
   validate_required_env_or_prompt
+  ensure_smtp_public_port
   load_ports
   install_docker_if_needed
   compose_up
@@ -603,6 +619,7 @@ update_app() {
   pick_compose_cmd
   detect_env_file
   validate_required_env_or_prompt
+  ensure_smtp_public_port
   load_ports
   compose_up
   save_state
