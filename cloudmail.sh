@@ -360,13 +360,27 @@ is_default_or_empty_env() {
   local key="$1" value="$2"
   case "$key" in
     JWT_SECRET)
-      [[ -z "$value" || "$value" == "change-me-at-least-32-random-chars" || "$value" == "请替换为至少32位强随机字符串" || ${#value} -lt 32 ]]
+      [[ -z "$value" \
+        || "$value" == "change-me-at-least-32-random-chars" \
+        || "$value" == "请替换为至少32位强随机字符串" \
+        || "$value" == local-dev-secret-* \
+        || "$value" == *please-change* \
+        || ${#value} -lt 32 ]]
       ;;
     ADMIN)
-      [[ -z "$value" || "$value" == "admin@yourdomain.com" || "$value" == "admin@example.com" ]]
+      [[ -z "$value" \
+        || "$value" == "admin@yourdomain.com" \
+        || "$value" == "admin@example.com" \
+        || "$value" == "admin@localhost" ]]
       ;;
     DOMAIN)
-      [[ -z "$value" || "$value" == '["yourdomain.com"]' || "$value" == '["example.com"]' || "$value" == '["localhost"]' ]]
+      [[ -z "$value" \
+        || "$value" == '["yourdomain.com"]' \
+        || "$value" == '["example.com"]' \
+        || "$value" == '["localhost"]' \
+        || "$value" == *localhost* \
+        || "$value" == *127.0.0.1* \
+        || "$value" == *test.local* ]]
       ;;
     *)
       return 1
@@ -434,10 +448,13 @@ validate_required_env_or_prompt() {
 
   while true; do
     admin="$(prompt_default "管理员邮箱 ADMIN（如 admin@example.com）" "$admin")"
-    if [[ "$admin" == *@* && "$admin" != "admin@yourdomain.com" && "$admin" != "admin@example.com" ]]; then
+    if [[ "$admin" == *@* \
+      && "$admin" != "admin@yourdomain.com" \
+      && "$admin" != "admin@example.com" \
+      && "$admin" != "admin@localhost" ]]; then
       break
     fi
-    warn "请输入真实管理员邮箱，不能使用 admin@yourdomain.com"
+    warn "请输入真实管理员邮箱，不能使用默认/本地域名邮箱"
   done
 
   default_domain="$(domain_from_admin "$admin")"
@@ -448,10 +465,10 @@ validate_required_env_or_prompt() {
   while true; do
     domains="$(prompt_default "收信域名 DOMAIN（可填 example.com 或 [\"example.com\"]）" "$default_domain")"
     domains="$(normalize_domain_json "$domains")"
-    if [[ "$domains" != '["yourdomain.com"]' && "$domains" != '["example.com"]' && "$domains" != '["localhost"]' ]]; then
+    if ! is_default_or_empty_env DOMAIN "$domains"; then
       break
     fi
-    warn "请输入真实收信域名，不能使用默认域名"
+    warn "请输入真实收信域名，不能使用默认/本地域名"
   done
 
   set_env_value JWT_SECRET "$jwt"
@@ -576,7 +593,7 @@ restart_app() {
 
 update_app() {
   require_state
-  if [[ "${PROJECT_SOURCE:-local}" == "git" && -d "$PROJECT_ROOT/.git" ]]; then
+  if [[ -d "$PROJECT_ROOT/.git" ]]; then
     info "拉取最新代码..."
     (
       cd "$PROJECT_ROOT"
