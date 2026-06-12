@@ -26,3 +26,32 @@ set_env_value "DOMAIN" '["mx.example.com"]'
 grep -q '^JWT_SECRET=abc/123$' "$tmp_env"
 grep -q '^ADMIN=root@example.com$' "$tmp_env"
 grep -q '^\QDOMAIN=["mx.example.com"]\E$' "$tmp_env" 2>/dev/null || grep -Fqx 'DOMAIN=["mx.example.com"]' "$tmp_env"
+
+tmp_project="$(mktemp -d)"
+tmp_script_dir="$(mktemp -d)"
+tmp_manual_project="$(mktemp -d)"
+trap 'rm -f "$tmp_env"; rm -rf "$tmp_project" "$tmp_script_dir" "$tmp_manual_project"' EXIT
+
+touch "$tmp_project/docker-compose.yml" "$tmp_project/Dockerfile"
+touch "$tmp_manual_project/docker-compose.yml" "$tmp_manual_project/Dockerfile"
+
+SCRIPT_DIR="$tmp_script_dir"
+PROJECT_ROOT=""
+PROJECT_SOURCE=""
+
+(
+  cd "$tmp_project"
+  discover_local_project_root
+  [[ "$PROJECT_ROOT" == "$tmp_project" ]]
+  [[ "$PROJECT_SOURCE" == "local" ]]
+)
+
+prompt_default() {
+  printf '%s' "$tmp_manual_project"
+}
+
+PROJECT_ROOT=""
+PROJECT_SOURCE=""
+prompt_for_project_root
+[[ "$PROJECT_ROOT" == "$tmp_manual_project" ]]
+[[ "$PROJECT_SOURCE" == "local" ]]

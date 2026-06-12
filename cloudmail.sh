@@ -61,6 +61,15 @@ trim() {
   printf '%s' "$value"
 }
 
+expand_path() {
+  local path="${1:-}"
+  case "$path" in
+    "~") printf '%s' "$HOME" ;;
+    "~"/*) printf '%s/%s' "$HOME" "${path#~/}" ;;
+    *) printf '%s' "$path" ;;
+  esac
+}
+
 is_interactive() {
   [[ -t 0 && -t 1 ]]
 }
@@ -93,6 +102,37 @@ set_env_value() {
 env_has_placeholder_values() {
   [[ -f "${ENV_FILE:-}" ]] || return 1
   grep -Eq '^JWT_SECRET=请替换为至少32位强随机字符串$|^ADMIN=admin@yourdomain\.com$|^DOMAIN=\["yourdomain\.com"\]$' "$ENV_FILE"
+}
+
+is_valid_project_root() {
+  local path="${1:-}"
+  [[ -n "$path" ]] || return 1
+  [[ -d "$path" && -f "$path/docker-compose.yml" && -f "$path/Dockerfile" ]]
+}
+
+discover_local_project_root() {
+  local candidate=""
+  for candidate in "$SCRIPT_DIR" "$PWD"; do
+    if is_valid_project_root "$candidate"; then
+      PROJECT_ROOT="$(cd "$candidate" && pwd)"
+      PROJECT_SOURCE="local"
+      return 0
+    fi
+  done
+  return 1
+}
+
+prompt_for_project_root() {
+  local answer=""
+  answer="$(prompt_default "项目代码目录（留空则自动克隆到 ${DEFAULT_INSTALL_DIR}）" "")"
+  answer="$(trim "$answer")"
+  [[ -n "$answer" ]] || return 1
+
+  answer="$(expand_path "$answer")"
+  is_valid_project_root "$answer" || die "项目目录无效：${answer}（需要包含 docker-compose.yml 和 Dockerfile）"
+
+  PROJECT_ROOT="$(cd "$answer" && pwd)"
+  PROJECT_SOURCE="local"
 }
 
 ensure_state_dir() {
@@ -463,11 +503,21 @@ NGINX_EOF"
 }
 
 prepare_runtime() {
-  if [[ -f "$SCRIPT_DIR/docker-compose.yml" && -f "$SCRIPT_DIR/Dockerfile" ]]; then
-    PROJECT_ROOT="$SCRIPT_DIR"
-    PROJECT_SOURCE="local"
+  if discover_local_project_root; then
+    :
+  elif is_interactive && prompt_for_project_root; then
+    :
   else
     clone_or_update_repo "$DEFAULT_INSTALL_DIR"
+    if ! is_valid_project_root "$PROJECT_ROOT"; then
+      if is_interactive; then
+        warn "默认克隆目录不是完整项目：$PROJECT_ROOT"
+        warn "你可以输入实际项目目录，或先修正仓库内容后再重新部署"
+        prompt_for_project_root || die "未找到可部署的项目目录：$PROJECT_ROOT"
+      else
+        die "默认克隆目录不是完整项目：$PROJECT_ROOT（需要包含 docker-compose.yml 和 Dockerfile）"
+      fi
+    fi
   fi
   ensure_project_root
   detect_env_file
