@@ -127,3 +127,29 @@ repair_project_root
 [[ "$PROJECT_ROOT" == "$tmp_repair_project" ]]
 [[ "$PROJECT_SOURCE" == "local" ]]
 grep -Fqx "PROJECT_ROOT='${tmp_repair_project}'" "$STATE_FILE"
+
+source "$SCRIPT_PATH"
+
+tmp_existing_repo="$(mktemp -d)"
+mkdir -p "${tmp_existing_repo}/.git"
+printf 'legacy\n' > "${tmp_existing_repo}/README.md"
+PROJECT_ROOT=""
+PROJECT_SOURCE=""
+GIT_REPO_URL="https://github.com/tztmr/cloudmail-server.git"
+clone_log="$(mktemp)"
+
+run_cmd() {
+  printf '%s\n' "$*" >> "$clone_log"
+  if [[ "$1" == "git" && "$2" == "clone" ]]; then
+    mkdir -p "$4"
+    touch "$4/docker-compose.yml" "$4/Dockerfile"
+  fi
+}
+
+clone_or_update_repo "$tmp_existing_repo"
+[[ "$PROJECT_ROOT" == "$tmp_existing_repo" ]]
+[[ "$PROJECT_SOURCE" == "git" ]]
+grep -Eq '^git clone https://github.com/tztmr/cloudmail-server\.git ' "$clone_log"
+[[ -f "${tmp_existing_repo}/docker-compose.yml" ]]
+[[ -f "${tmp_existing_repo}/Dockerfile" ]]
+find "$(dirname "$tmp_existing_repo")" -maxdepth 1 -name "$(basename "$tmp_existing_repo").backup.*" | grep -q .

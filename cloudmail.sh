@@ -363,6 +363,24 @@ require_state() {
   ensure_project_root
 }
 
+backup_and_reclone_repo() {
+  local install_dir="$1"
+  local backup_dir="${install_dir}.backup.$(date +%Y%m%d%H%M%S)"
+
+  if [[ -e "$install_dir" ]]; then
+    warn "检测到现有目录不是完整项目，准备备份后重新克隆"
+    if (( DRY_RUN )); then
+      info "[dry-run] mv ${install_dir} ${backup_dir}"
+    else
+      mv "$install_dir" "$backup_dir"
+      ok "已备份旧目录到：$backup_dir"
+    fi
+  fi
+
+  info "开始从 Git 克隆项目..."
+  run_cmd git clone "$GIT_REPO_URL" "$install_dir"
+}
+
 clone_or_update_repo() {
   local install_dir="$1"
   GIT_REPO_URL="${GIT_REPO_URL:-$DEFAULT_GIT_REPO_URL}"
@@ -375,9 +393,11 @@ clone_or_update_repo() {
       cd "$PROJECT_ROOT"
       run_cmd git pull --ff-only
     )
+    if ! is_valid_project_root "$PROJECT_ROOT"; then
+      backup_and_reclone_repo "$PROJECT_ROOT"
+    fi
   else
-    info "开始从 Git 克隆项目..."
-    run_cmd git clone "$GIT_REPO_URL" "$PROJECT_ROOT"
+    backup_and_reclone_repo "$PROJECT_ROOT"
   fi
 }
 
