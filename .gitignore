@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+**/dist/
+mail-worker/dist/
+
+# Data and runtime
+data/
+**/data/
+*.db
+*.db-shm
+*.db-wal
+data-test*/
+**/data-test*/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+mail-worker/.env
+mail-worker/.env.*
+
+# IDE and OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+
+# Wrangler / Cloudflare (keep source, ignore builds if any)
+.wrangler/
+
+# Test
+test-results/
+coverage/
+
+# Misc
+*.tgz
+*.tar.gz

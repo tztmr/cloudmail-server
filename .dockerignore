@@ -1,0 +1,26 @@
+# Ignore heavy / unnecessary files for Docker context
+node_modules
+**/node_modules
+.git
+.gitignore
+*.log
+dist
+**/dist
+data
+**/data
+data-test*
+**/*.test.js
+**/*.spec.js
+wrangler*.toml
+.env
+.env.*
+mail-worker/.env*
+mail-worker/data*
+mail-worker/dist
+mail-vue/dist
+doc/
+*.md
+LICENSE
+docker-compose*.yml
+Dockerfile*
+!.dockerignore

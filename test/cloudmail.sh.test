@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+SCRIPT_PATH="${ROOT_DIR}/cloudmail.sh"
+
+source "$SCRIPT_PATH"
+
+tmp_env="$(mktemp)"
+trap 'rm -f "$tmp_env"' EXIT
+
+cat > "$tmp_env" <<'EOF'
+JWT_SECRET=请替换为至少32位强随机字符串
+ADMIN=admin@yourdomain.com
+DOMAIN=["yourdomain.com"]
+EOF
+
+ENV_FILE="$tmp_env"
+
+env_has_placeholder_values
+
+set_env_value "JWT_SECRET" 'abc/123'
+set_env_value "ADMIN" 'root@example.com'
+set_env_value "DOMAIN" '["mx.example.com"]'
+
+grep -q '^JWT_SECRET=abc/123$' "$tmp_env"
+grep -q '^ADMIN=root@example.com$' "$tmp_env"
+grep -q '^\QDOMAIN=["mx.example.com"]\E$' "$tmp_env" 2>/dev/null || grep -Fqx 'DOMAIN=["mx.example.com"]' "$tmp_env"
