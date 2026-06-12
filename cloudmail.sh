@@ -112,7 +112,13 @@ is_valid_project_root() {
 
 discover_local_project_root() {
   local candidate=""
-  for candidate in "$SCRIPT_DIR" "$PWD"; do
+  for candidate in \
+    "$SCRIPT_DIR" \
+    "$PWD" \
+    "$HOME/cloudmail-server" \
+    "$HOME/cloudmail_server" \
+    "/opt/cloudmail-server" \
+    "/opt/cloudmail_server"; do
     if is_valid_project_root "$candidate"; then
       PROJECT_ROOT="$(cd "$candidate" && pwd)"
       PROJECT_SOURCE="local"
@@ -133,6 +139,15 @@ prompt_for_project_root() {
 
   PROJECT_ROOT="$(cd "$answer" && pwd)"
   PROJECT_SOURCE="local"
+}
+
+repair_project_root() {
+  prompt_for_project_root || die "未提供可用的项目目录"
+  ensure_project_root
+  detect_env_file
+  detect_public_ports
+  save_state
+  ok "项目目录已修复：$PROJECT_ROOT"
 }
 
 ensure_state_dir() {
@@ -198,7 +213,7 @@ usage() {
 CloudMail Server 一键部署脚本
 
 用法：
-  bash cloudmail.sh [--dry-run] [deploy|status|logs|restart|update|enable-ssl|uninstall|menu]
+  bash cloudmail.sh [--dry-run] [deploy|status|logs|restart|update|enable-ssl|repair-project|uninstall|menu]
 
 不带子命令时：
   - 交互式终端：进入菜单
@@ -221,7 +236,7 @@ while (( $# > 0 )); do
       usage
       exit 0
       ;;
-    deploy|status|logs|restart|update|enable-ssl|uninstall|menu)
+    deploy|status|logs|restart|update|enable-ssl|repair-project|uninstall|menu)
       [[ -n "$ACTION" ]] && die "一次只能执行一个命令"
       ACTION="$1"
       ;;
@@ -719,7 +734,8 @@ print_menu() {
   echo "4) 重启服务"
   echo "5) 更新应用"
   echo "6) 启用 HTTPS（nginx + certbot）"
-  echo "7) 卸载"
+  echo "7) 修复项目目录"
+  echo "8) 卸载"
   echo "0) 退出"
   echo "================================================="
 }
@@ -728,7 +744,7 @@ menu_loop() {
   local choice
   while true; do
     print_menu
-    printf '请选择 [0-7]: ' >&2
+    printf '请选择 [0-8]: ' >&2
     read -r choice
     choice="$(trim "$choice")"
     case "$choice" in
@@ -738,7 +754,8 @@ menu_loop() {
       4) restart_app ;;
       5) update_app ;;
       6) enable_ssl ;;
-      7) uninstall_app ;;
+      7) repair_project_root ;;
+      8) uninstall_app ;;
       0) exit 0 ;;
       *) warn "无效选项" ;;
     esac
@@ -753,6 +770,7 @@ main() {
     restart) restart_app ;;
     update) update_app ;;
     enable-ssl) enable_ssl ;;
+    repair-project) repair_project_root ;;
     uninstall) uninstall_app ;;
     menu) menu_loop ;;
     "")

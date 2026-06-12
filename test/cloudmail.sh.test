@@ -81,3 +81,49 @@ prepare_runtime
 [[ "$PROJECT_ROOT" == "$tmp_cloned_project" ]]
 [[ "$PROJECT_SOURCE" == "git" ]]
 [[ ! -f "$prompt_marker" ]]
+
+source "$SCRIPT_PATH"
+
+tmp_home="$(mktemp -d)"
+tmp_home_project="${tmp_home}/cloudmail-server"
+mkdir -p "$tmp_home_project"
+touch "$tmp_home_project/docker-compose.yml" "$tmp_home_project/Dockerfile"
+
+HOME="$tmp_home"
+SCRIPT_DIR="$tmp_script_dir"
+PROJECT_ROOT=""
+PROJECT_SOURCE=""
+(
+  cd /
+  discover_local_project_root
+  [[ "$PROJECT_ROOT" == "$tmp_home_project" ]]
+  [[ "$PROJECT_SOURCE" == "local" ]]
+)
+
+source "$SCRIPT_PATH"
+
+tmp_repair_project="$(mktemp -d)"
+touch "$tmp_repair_project/docker-compose.yml" "$tmp_repair_project/Dockerfile"
+STATE_DIR="$(mktemp -d)"
+STATE_FILE="${STATE_DIR}/state.env"
+PROJECT_ROOT=""
+PROJECT_SOURCE=""
+ENV_FILE=""
+APP_NAME="cloudmail"
+WEB_PORT="3000"
+SMTP_PORT="2525"
+APP_HOSTNAME="0.0.0.0"
+GIT_REPO_URL="git@example.com:test.git"
+DEFAULT_INSTALL_DIR="/unused"
+prompt_default() {
+  printf '%s' "$tmp_repair_project"
+}
+detect_env_file() {
+  ENV_FILE="${PROJECT_ROOT}/.env"
+  : > "$ENV_FILE"
+}
+detect_public_ports() { :; }
+repair_project_root
+[[ "$PROJECT_ROOT" == "$tmp_repair_project" ]]
+[[ "$PROJECT_SOURCE" == "local" ]]
+grep -Fqx "PROJECT_ROOT='${tmp_repair_project}'" "$STATE_FILE"
