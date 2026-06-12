@@ -20,8 +20,11 @@ export function createD1Adapter(dbPath) {
   function makeStatement(sql) {
     let params = [];
     const stmtObj = {
+      _sql: sql,
+      _params: params,
       bind(...p) {
         params = p;
+        stmtObj._params = params;
         return stmtObj;
       },
       async run() {
@@ -90,10 +93,9 @@ export function createD1Adapter(dbPath) {
             }
             continue;
           }
-          // 如果已经是原生 better-sqlite stmt (有 .run)
-          if (s && typeof s.run === 'function' && typeof s.all === 'function') {
+          // 原生 better-sqlite3 Statement 没有 _sql/_params 标记
+          if (s && s._sql === undefined && typeof s.run === 'function' && typeof s.all === 'function') {
             try {
-              // 假设是 better-sqlite3 Statement
               const info = s.run();
               results.push({ success: true, meta: { changes: info.changes || 0 } });
             } catch (e) {

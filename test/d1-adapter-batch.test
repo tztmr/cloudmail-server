@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+TARGET="${ROOT_DIR}/mail-worker/src/adapter/d1-adapter.js"
+
+grep -Fq '_sql: sql,' "$TARGET"
+grep -Fq '_params: params,' "$TARGET"
+grep -Fq 'stmtObj._params = params;' "$TARGET"
+grep -Fq 'const stmt = sqlite.prepare(s._sql);' "$TARGET"
+grep -Fq 'const info = stmt.run(s._params || []);' "$TARGET"
+grep -Fq "if (s && s._sql === undefined && typeof s.run === 'function' && typeof s.all === 'function') {" "$TARGET"
+if grep -Fq "if (s && typeof s.run === 'function' && typeof s.all === 'function') {" "$TARGET"; then
+  echo "batch() native-statement branch must exclude wrapper statements"
+  exit 1
+fi
